@@ -1,0 +1,76 @@
+{
+  "name": "@toldyaonce/email-utils",
+  "version": "1.0.0",
+  "description": "Reusable TypeScript package for sending transactional and bulk HTML emails using AWS SES",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "preview": "tsx src/preview/server.ts",
+    "example": "tsx examples/complete-example.ts",
+    "cdk:deploy": "cdk deploy",
+    "cdk:diff": "cdk diff",
+    "cdk:destroy": "cdk destroy",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "keywords": [
+    "email",
+    "aws",
+    "ses",
+    "transactional",
+    "templates",
+    "typescript",
+    "i18n"
+  ],
+  "author": "KX Tech",
+  "license": "MIT",
+  "files": [
+    "dist/**/*",
+    "templates/**/*",
+    "cdk/**/*"
+  ],
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.470.0",
+    "@aws-sdk/client-dynamodb": "^3.470.0",
+    "@aws-sdk/lib-dynamodb": "^3.470.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.7",
+    "html-to-text": "^9.0.5",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/jest": "^29.5.8",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/nodemailer": "^6.4.14",
+    "@types/mustache": "^4.2.5",
+    "@types/express": "^4.17.21",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "aws-cdk-lib": "^2.108.0",
+    "constructs": "^10.3.0",
+    "eslint": "^8.54.0",
+    "express": "^4.18.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.2"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "^2.100.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toldyaonce/kx-email-utils.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
