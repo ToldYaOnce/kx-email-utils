@@ -4,20 +4,28 @@
 
 import express from 'express';
 import { TemplateRegistry, createTemplate } from '../templates';
-import { inviteTemplate as enInviteTemplate } from '../../templates/en/invite';
-import { resetPasswordTemplate as enResetTemplate } from '../../templates/en/reset-password';
-import { inviteTemplate as esInviteTemplate } from '../../templates/es/invite';
-import { resetPasswordTemplate as esResetTemplate } from '../../templates/es/reset-password';
 import type { Locale, InviteEmailInput, ResetPasswordInput } from '../types';
 
 const app = express();
 
-// Initialize template registry with default templates
+// Initialize template registry
 const templateRegistry = new TemplateRegistry();
-templateRegistry.registerFromDefinition('invite', 'en', enInviteTemplate);
-templateRegistry.registerFromDefinition('resetPassword', 'en', enResetTemplate);
-templateRegistry.registerFromDefinition('invite', 'es', esInviteTemplate);
-templateRegistry.registerFromDefinition('resetPassword', 'es', esResetTemplate);
+
+// Add basic sample templates for preview
+const sampleInviteTemplate = createTemplate({
+  subject: 'You\'re invited to join {{companyName}}',
+  html: '<h1>Welcome {{name}}!</h1><p>Join {{companyName}} as {{role}}</p><a href="{{inviteUrl}}">Accept</a>',
+  text: 'Welcome {{name}}! Join {{companyName}} as {{role}}. Link: {{inviteUrl}}',
+});
+
+const sampleResetTemplate = createTemplate({
+  subject: 'Reset your password',
+  html: '<h1>Password Reset</h1><p>Hi {{name}}, <a href="{{resetUrl}}">reset your password</a></p>',
+  text: 'Hi {{name}}, reset your password: {{resetUrl}}',
+});
+
+templateRegistry.registerTemplate('invite', 'en', sampleInviteTemplate);
+templateRegistry.registerTemplate('resetPassword', 'en', sampleResetTemplate);
 
 // Middleware
 app.use(express.json());
@@ -248,9 +256,9 @@ app.get('/preview/invite', async (req, res) => {
       data: sampleData,
     });
 
-    res.send(previewHtml);
+    return res.send(previewHtml);
   } catch (error) {
-    res.status(500).send(`Error rendering template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return res.status(500).send(`Error rendering template: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 });
 
@@ -282,9 +290,9 @@ app.get('/preview/reset-password', async (req, res) => {
       data: sampleData,
     });
 
-    res.send(previewHtml);
+    return res.send(previewHtml);
   } catch (error) {
-    res.status(500).send(`Error rendering template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return res.status(500).send(`Error rendering template: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 });
 
@@ -326,9 +334,9 @@ app.get('/preview/:type/text', async (req, res) => {
     const content = await template.render(sampleData, locale);
     
     res.type('text/plain');
-    res.send(content.text);
+    return res.send(content.text);
   } catch (error) {
-    res.status(500).send(`Error rendering template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return res.status(500).send(`Error rendering template: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 });
 

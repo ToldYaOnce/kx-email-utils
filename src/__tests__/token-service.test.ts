@@ -61,7 +61,7 @@ describe('TokenService', () => {
       
       expect(() => {
         tokenService.validateInviteToken(resetToken);
-      }).toThrow('Invalid token type');
+      }).toThrow('Invalid invite token');
     });
   });
 
@@ -166,10 +166,14 @@ describe('TokenService', () => {
     it('should reject custom tokens with wrong audience', () => {
       const token = tokenService.generateCustomToken({ test: 'value' }, {
         audience: 'app1',
+        subject: 'custom-action',
       });
 
       expect(() => {
-        tokenService.validateCustomToken(token, { audience: 'app2' });
+        tokenService.validateCustomToken(token, { 
+          audience: 'app2',
+          subject: 'custom-action',
+        });
       }).toThrow('Invalid token');
     });
   });

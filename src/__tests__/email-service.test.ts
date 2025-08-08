@@ -105,8 +105,14 @@ describe('EmailService', () => {
     });
 
     it('should generate invite URL if not provided', async () => {
-      const inputWithoutUrl = { ...inviteInput };
-      delete inputWithoutUrl.inviteUrl;
+      const inputWithoutUrl: Omit<typeof inviteInput, 'inviteUrl'> = {
+        email: inviteInput.email,
+        name: inviteInput.name,
+        companyName: inviteInput.companyName,
+        companyId: inviteInput.companyId,
+        inviterName: inviteInput.inviterName,
+        role: inviteInput.role,
+      };
 
       const result = await emailService.sendInviteEmail(inputWithoutUrl);
       expect(result).toBeDefined();

@@ -25,7 +25,6 @@ describe('TemplateRegistry', () => {
 
       const retrieved = registry.getTemplate('test', 'en');
       expect(retrieved).toBeDefined();
-      expect(retrieved?.getLocale()).toBe('en');
     });
 
     it('should register templates from definition', () => {

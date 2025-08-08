@@ -190,10 +190,12 @@ export class BulkEmailService {
               DataType: 'Number',
               StringValue: index.toString(),
             },
-            Campaign: job.options.campaign ? {
-              DataType: 'String',
-              StringValue: job.options.campaign,
-            } : undefined,
+            ...(job.options.campaign && {
+              Campaign: {
+                DataType: 'String',
+                StringValue: job.options.campaign,
+              }
+            }),
           },
         }));
       });

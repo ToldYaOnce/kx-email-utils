@@ -80,10 +80,11 @@ export class TemplateRegistry {
    * Set all templates at once
    */
   setTemplates(templates: Partial<TemplateCollection>): void {
-    this.templates = {
-      ...this.templates,
-      ...templates,
-    };
+    Object.keys(templates).forEach(key => {
+      if (templates[key]) {
+        this.templates[key] = templates[key]!;
+      }
+    });
   }
 
   /**
