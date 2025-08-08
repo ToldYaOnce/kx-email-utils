@@ -41,7 +41,7 @@ export class TokenService {
       expiresIn: expiresIn || this.defaultExpiry,
       issuer: '@kxtech/email-utils',
       audience: 'invite',
-    });
+    } as jwt.SignOptions);
   }
 
   /**
@@ -62,7 +62,7 @@ export class TokenService {
       expiresIn: expiresIn || this.defaultExpiry,
       issuer: '@kxtech/email-utils',
       audience: 'reset',
-    });
+    } as jwt.SignOptions);
   }
 
   /**
@@ -185,7 +185,7 @@ export class TokenService {
       issuer: '@kxtech/email-utils',
       audience: options.audience,
       subject: options.subject,
-    });
+    } as jwt.SignOptions);
   }
 
   /**

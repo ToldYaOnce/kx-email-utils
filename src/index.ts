@@ -14,6 +14,17 @@ export { BounceTracker } from './services/bounce-tracker';
 export type { BulkEmailConfig } from './services/bulk-email';
 export { BulkEmailService } from './services/bulk-email';
 
+// Import types for use in this file
+import { EmailService } from './services/email-service';
+import { TokenService } from './services/tokens';
+import type {
+  EmailServiceConfig,
+  EmailConfig,
+  InviteEmailInput,
+  ResetPasswordInput,
+  EmailSendOptions,
+} from './types';
+
 // Template system
 export { 
   TemplateRegistry, 
@@ -60,11 +71,8 @@ export type {
   EmailType,
 } from './types';
 
-// Default templates
-export { inviteTemplate as defaultInviteTemplateEN } from '../templates/en/invite';
-export { resetPasswordTemplate as defaultResetTemplateEN } from '../templates/en/reset-password';
-export { inviteTemplate as defaultInviteTemplateES } from '../templates/es/invite';
-export { resetPasswordTemplate as defaultResetTemplateES } from '../templates/es/reset-password';
+// Note: Default templates are available through the template registry
+// Templates are loaded automatically when EmailService is instantiated
 
 /**
  * Create a new email service instance
