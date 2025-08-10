@@ -1,5 +1,5 @@
 {
-  "name": "@toldyaonce/email-utils",
+  "name": "@toldyaonce/kx-email-utils",
   "version": "1.0.0",
   "description": "Reusable TypeScript package for sending transactional and bulk HTML emails using AWS SES",
   "main": "dist/index.js",
@@ -17,7 +17,6 @@
     "cdk:deploy": "cdk deploy",
     "cdk:diff": "cdk diff",
     "cdk:destroy": "cdk destroy",
-
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -41,6 +40,8 @@
     "@aws-sdk/client-ses": "^3.470.0",
     "@aws-sdk/client-sqs": "^3.470.0",
     "@aws-sdk/lib-dynamodb": "^3.470.0",
+    "@toldyaonce/kx-email-utils": "1.0.0",
+    "dotenv": "17.2.1",
     "html-to-text": "^9.0.5",
     "jsonwebtoken": "^9.0.2",
     "mustache": "^4.2.0",

@@ -2,22 +2,25 @@
  * Complete example demonstrating all features of @kxtech/email-utils
  */
 
+import 'dotenv/config'; // Load environment variables from .env file
+
 import {
   createEmailService,
   EmailService,
   createTemplate,
   generateInviteToken,
   validateInviteToken,
-} from '@kxtech/email-utils';
+} from '@toldyaonce/kx-email-utils';
 
-// Example configuration
+// Configuration from environment variables
 const emailConfig = {
-  region: 'us-east-1',
-  defaultFrom: 'noreply@kxtech.io',
-  jwtSecret: 'your-super-secret-jwt-key-change-this-in-production',
-  defaultTokenExpiry: '24h',
-  bounceTableName: 'dev-email-bounces', // Optional - for bounce tracking
-  bulkQueueUrl: 'https://sqs.us-east-1.amazonaws.com/123456789/dev-bulk-email', // Optional - for bulk processing
+  region: process.env.AWS_REGION || 'us-east-1',
+  defaultFrom: process.env.EMAIL_DEFAULT_FROM || 'noreply@kxtech.io',
+  jwtSecret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
+  defaultTokenExpiry: process.env.TOKEN_EXPIRY || '24h',
+  devMode: process.env.NODE_ENV === 'development', // Skip actual AWS calls in dev
+  bounceTableName: process.env.BOUNCE_TABLE_NAME, // Optional - for bounce tracking
+  bulkQueueUrl: process.env.BULK_QUEUE_URL, // Optional - for bulk processing
 };
 
 async function main(): Promise<void> {
@@ -25,16 +28,89 @@ async function main(): Promise<void> {
 
   // Initialize the email service
   const emailService = createEmailService(emailConfig);
+  
+  // Add basic templates since default loading is disabled
+  const inviteTemplate = createTemplate({
+    subject: 'You\'re invited to join {{companyName}}!',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #2563eb;">Welcome to {{companyName}}!</h1>
+        <p>Hi {{name}},</p>
+        <p><strong>{{inviterName}}</strong> has invited you to join <strong>{{companyName}}</strong> as a <strong>{{role}}</strong>.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="{{inviteUrl}}" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+            Accept Invitation
+          </a>
+        </div>
+        <p>If the button doesn't work, copy this link: {{inviteUrl}}</p>
+        <p>Best regards,<br>The {{companyName}} Team</p>
+      </div>
+    `,
+    text: `
+Welcome to {{companyName}}!
+
+Hi {{name}},
+
+{{inviterName}} has invited you to join {{companyName}} as a {{role}}.
+
+Accept your invitation: {{inviteUrl}}
+
+Best regards,
+The {{companyName}} Team
+    `,
+  });
+
+  const resetTemplate = createTemplate({
+    subject: 'Reset your password',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #dc2626;">Reset Your Password</h1>
+        <p>Hi {{name}},</p>
+        <p>We received a request to reset your password.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="{{resetUrl}}" style="background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+            Reset Password
+          </a>
+        </div>
+        <p>This link expires in {{expiresIn}}.</p>
+        <p>If you didn't request this, please ignore this email.</p>
+      </div>
+    `,
+    text: `
+Reset Your Password
+
+Hi {{name}},
+
+We received a request to reset your password.
+
+Reset link: {{resetUrl}}
+
+This link expires in {{expiresIn}}.
+
+If you didn't request this, please ignore this email.
+    `,
+  });
+
+  // Register the templates
+  emailService.setTemplates({
+    invite: { en: inviteTemplate },
+    resetPassword: { en: resetTemplate },
+  });
+  
+  console.log('✅ Templates loaded successfully');
 
   // Example 1: Send invite email
   console.log('📧 Example 1: Sending invite email');
   try {
+    if(!process.env.EMAIL_TO) {
+      throw new Error('EMAIL_TO is not set');
+    }
     const inviteResult = await emailService.sendInviteEmail({
-      email: 'john.doe@example.com',
-      name: 'John Doe',
-      companyName: 'KX Technology',
-      companyId: 'kx-tech-001',
-      inviterName: 'Jane Smith',
+      email: process.env.EMAIL_TO,
+      name: process.env.NAME || 'David Glass',
+      companyName: process.env.COMPANY_NAME || 'KX Tech',
+      companyId: process.env.COMPANY_ID || 'kx-tech-001',
+      inviterName: 'David Glass',
       role: 'Senior Developer',
       message: 'We are excited to have you join our engineering team!',
     }, {
@@ -46,14 +122,14 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error('❌ Failed to send invite email:', error);
   }
-
+  return;
   // Example 2: Send password reset email in Spanish
   console.log('\n📧 Example 2: Sending password reset email (Spanish)');
   try {
     const resetResult = await emailService.sendResetPasswordEmail({
-      email: 'maria.garcia@example.com',
-      name: 'María García',
-      resetUrl: 'https://app.kxtech.io/reset-password',
+      email: process.env.EMAIL_TO || 'maria.garcia@example.com',
+      name: process.env.NAME || 'María García',
+      resetUrl: process.env.RESET_URL || 'https://app.kxtech.io/reset-password',
       expiresIn: '2 horas',
     }, {
       locale: 'es',
@@ -70,9 +146,9 @@ async function main(): Promise<void> {
   try {
     // Generate tokens
     const inviteToken = generateInviteToken(emailConfig, {
-      email: 'developer@example.com',
-      companyId: 'kx-tech-001',
-      role: 'Full Stack Developer',
+      email: process.env.EMAIL_TO || 'developer@example.com',
+      companyId: process.env.COMPANY_ID || 'kx-tech-001',
+      role: process.env.ROLE || 'Full Stack Developer',
     }, '48h');
 
     console.log('🎫 Generated invite token:', inviteToken);
@@ -202,8 +278,8 @@ The {{companyName}} Team
   try {
     const recipients = [
       { email: 'user1@example.com', name: 'Alice Smith', personalizedData: { department: 'Engineering' } },
-      { email: 'user2@example.com', name: 'Bob Johnson', personalizedData: { department: 'Design' } },
-      { email: 'user3@example.com', name: 'Carol Davis', personalizedData: { department: 'Marketing' } },
+      // { email: 'user2@example.com', name: 'Bob Johnson', personalizedData: { department: 'Design' } },
+      // { email: 'user3@example.com', name: 'Carol Davis', personalizedData: { department: 'Marketing' } },
     ];
 
     const bulkResult = await emailService.sendAdvancedBulkEmail(
