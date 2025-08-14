@@ -1,6 +1,6 @@
 {
   "name": "@toldyaonce/kx-email-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reusable TypeScript package for sending transactional and bulk HTML emails using AWS SES",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -40,7 +40,7 @@
     "@aws-sdk/client-ses": "^3.470.0",
     "@aws-sdk/client-sqs": "^3.470.0",
     "@aws-sdk/lib-dynamodb": "^3.470.0",
-    "@toldyaonce/kx-email-utils": "1.0.0",
+    "@toldyaonce/kx-email-utils": "1.0.1",
     "dotenv": "17.2.1",
     "html-to-text": "^9.0.5",
     "jsonwebtoken": "^9.0.2",
@@ -71,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/toldyaonce/kx-email-utils.git"
+    "url": "git+https://github.com/toldyaonce/kx-email-utils.git"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"

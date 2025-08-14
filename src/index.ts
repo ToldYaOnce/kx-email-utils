@@ -106,6 +106,20 @@ export async function sendResetPasswordEmail(
 }
 
 /**
+ * Convenience function for sending templated emails with custom data
+ */
+export async function sendTemplatedEmail(
+  config: EmailServiceConfig,
+  templateType: string,
+  email: string,
+  data: Record<string, any>,
+  options?: EmailSendOptions
+) {
+  const service = new EmailService(config);
+  return service.sendTemplatedEmail(templateType, email, data, options);
+}
+
+/**
  * Convenience function for generating invite tokens
  */
 export function generateInviteToken(

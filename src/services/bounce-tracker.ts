@@ -124,7 +124,7 @@ export class BounceTracker {
 
       // Add time range filter if provided
       if (startDate || endDate) {
-        const filterExpressions = [];
+        const filterExpressions: string[] = [];
         
         if (startDate) {
           queryParams.ExpressionAttributeValues[':startDate'] = startDate.toISOString();

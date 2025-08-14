@@ -202,6 +202,57 @@ export class EmailService {
   }
 
   /**
+   * Send a templated email with custom data
+   */
+  async sendTemplatedEmail(
+    templateType: string,
+    email: string,
+    data: Record<string, any>,
+    options: EmailSendOptions = {}
+  ): Promise<EmailResult> {
+    try {
+      // Get template
+      const template = options.template || 
+        this.templateRegistry.getTemplate(templateType, options.locale);
+      
+      if (!template) {
+        throw new Error(`Template '${templateType}' not found for locale '${options.locale || 'en'}'`);
+      }
+
+      // Render email content with custom data
+      const content = await template.render(data, options.locale);
+      
+      // Override subject if provided
+      if (options.subject) {
+        content.subject = options.subject;
+      }
+
+      // Build email message
+      const message: EmailMessage = {
+        from: options.from || this.config.defaultFrom,
+        to: email,
+        content,
+        replyTo: options.replyTo,
+        headers: options.headers,
+        metadata: {
+          type: (templateType as any) || 'custom',
+          campaign: options.campaign,
+          locale: options.locale,
+        },
+      };
+
+      return this.sendEmail(message);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        recipient: email,
+        timestamp: new Date(),
+      };
+    }
+  }
+
+  /**
    * Send bulk emails (future-proofed for scale)
    */
   async sendBulkEmail(

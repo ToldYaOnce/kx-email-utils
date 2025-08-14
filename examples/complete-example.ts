@@ -10,7 +10,8 @@ import {
   createTemplate,
   generateInviteToken,
   validateInviteToken,
-} from '@toldyaonce/kx-email-utils';
+  sendTemplatedEmail,
+} from '../src';
 
 // Configuration from environment variables
 const emailConfig = {
@@ -113,12 +114,88 @@ If you didn't request this, please ignore this email.
       inviterName: 'David Glass',
       role: 'Senior Developer',
       message: 'We are excited to have you join our engineering team!',
-    }, {
+      // Add your custom variables here
+      tenantId: process.env.TENANT_ID || 'tenant-123',
+      supportEmail: process.env.SUPPORT_EMAIL || 'support@kxtech.com',
+    } as any, {
       locale: 'en',
       campaign: 'q4-hiring',
     });
 
     console.log('✅ Invite email result:', inviteResult);
+
+  // Example: Using the new sendTemplatedEmail with custom variables
+  console.log('📧 Testing sendTemplatedEmail with custom template...');
+  
+  // First, let's add a custom template with your variables
+  const customTemplate = createTemplate({
+    subject: '⚠️ EMAIL TEST - {{name}} {{companyName}}',
+    html: `
+            <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; border: 3px solid #ff6b6b; padding: 20px;">
+              <div style="background: #ff6b6b; color: white; padding: 15px; text-align: center; margin: -20px -20px 20px -20px;">
+                <h1 style="margin: 0;">⚠️ EMAIL TEST IN PROGRESS ⚠️</h1>
+                <p style="margin: 5px 0 0 0;">This is a real email from kx-auth testing</p>
+              </div>
+              
+              <h2 style="color: #333;">Hello {{name}}! 👋</h2>
+              
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 16px;">
+                  <strong>{{inviterName}}</strong> has invited you to join <strong>{{companyName}}</strong> as a <strong>{{role}}</strong>.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{{inviteUrl}}" style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+                  🚀 Accept Test Invitation
+                </a>
+              </div>
+              
+              <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                <h4 style="margin: 0 0 10px 0; color: #2e7d32;">✅ Test Information:</h4>
+                <ul style="margin: 0; color: #2e7d32;">
+                  <li>Tenant ID: {{tenantId}}</li>
+                  <li>Support: {{supportEmail}}</li>
+                  <li>Test Environment: Development</li>
+                  <li>Timestamp: {{timestamp}}</li>
+                </ul>
+              </div>
+              
+              <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
+                <p>This is a test email from kx-auth email service integration testing.</p>
+              </div>
+            </div>
+          `,
+  });
+
+  // Register the custom template
+  emailService.setTemplates({
+    customTest: { en: customTemplate },
+  });
+
+  // Now send using sendTemplatedEmail with all your custom variables
+  // Cast to any since TypeScript might not recognize the method yet
+  const customResult = await (emailService as any).sendTemplatedEmail(
+    'customTest',
+    process.env.EMAIL_TO,
+    {
+      name: process.env.NAME || 'David Glass',
+      companyName: process.env.COMPANY_NAME || 'KX Tech',
+      companyId: process.env.COMPANY_ID || 'kx-tech-001',
+      inviterName: 'David Glass',
+      role: 'Senior Developer',
+      inviteUrl: 'https://app.kxtech.com/invite?token=test123',
+      tenantId: process.env.TENANT_ID || 'tenant-123',
+      supportEmail: process.env.SUPPORT_EMAIL || 'support@kxtech.com',
+      timestamp: new Date().toISOString(),
+    },
+    {
+      locale: 'en',
+      campaign: 'custom-test',
+    }
+  );
+
+  console.log('✅ Custom templated email result:', customResult);
   } catch (error) {
     console.error('❌ Failed to send invite email:', error);
   }
